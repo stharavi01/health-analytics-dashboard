@@ -25,7 +25,7 @@ interface TableProps {
   className?: string;
 }
 
-function TableRoot({ children, className }: TableProps) {
+function Root({ children, className }: TableProps) {
   return (
     <div className="relative w-full overflow-auto">
       <table className={cn("w-full caption-bottom text-sm", className)}>
