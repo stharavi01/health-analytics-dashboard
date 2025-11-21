@@ -1,4 +1,5 @@
 import { Menu } from "lucide-react";
+import { ThemeToggle } from "../ThemeToggle";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -9,7 +10,7 @@ interface HeaderProps {
  */
 export function Header({ onMenuClick }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="flex h-16 items-center px-4 gap-4">
         {/* Mobile menu button */}
         <button
@@ -33,8 +34,9 @@ export function Header({ onMenuClick }: HeaderProps) {
           </h1>
         </div>
 
-        {/* Right side - placeholder for user menu */}
+        {/* Right side - theme toggle and user menu */}
         <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle />
           <div className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center">
             <span className="text-sm font-medium text-secondary-foreground">
               U

@@ -30,7 +30,7 @@ export function TablePagination({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 bg-card">
       {/* Items per page */}
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground">Rows per page:</span>

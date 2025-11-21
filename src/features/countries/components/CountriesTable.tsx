@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Country } from "../types/country.types";
 import { toast } from "@/lib/toast";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { setSort, selectFilters } from "@/features/filters/filtersSlice";
 
 interface CountriesTableProps {
   countries: Country[];
   currentPage: number;
   itemsPerPage: number;
+  onRowClick?: (country: Country) => void;
 }
 
 /**
@@ -17,15 +20,19 @@ export function CountriesTable({
   countries,
   currentPage,
   itemsPerPage,
+  onRowClick,
 }: CountriesTableProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const filters = useAppSelector(selectFilters);
 
   // Calculate paginated data
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedCountries = countries.slice(startIndex, endIndex);
 
-  const handleCopy = async (country: Country) => {
+  const handleCopy = async (country: Country, e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       const data = {
         country: country.country,
@@ -43,22 +50,92 @@ export function CountriesTable({
     }
   };
 
+  const handleSort = (column: typeof filters.sortBy) => {
+    const newOrder =
+      filters.sortBy === column && filters.sortOrder === "desc"
+        ? "asc"
+        : "desc";
+    dispatch(setSort({ sortBy: column, sortOrder: newOrder }));
+  };
+
+  const SortIcon = ({ column }: { column: typeof filters.sortBy }) => {
+    if (filters.sortBy !== column)
+      return <ArrowUpDown className="h-3 w-3 ml-1 opacity-50" />;
+    return filters.sortOrder === "desc" ? (
+      <ArrowDown className="h-3 w-3 ml-1" />
+    ) : (
+      <ArrowUp className="h-3 w-3 ml-1" />
+    );
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead className="bg-muted sticky top-0 z-10">
           <tr>
-            <th className="px-4 py-3 text-left text-sm font-medium sticky left-0 bg-muted z-20">
-              Country
+            <th
+              className="px-4 py-3 text-left text-sm font-medium sticky left-0 bg-muted z-20 cursor-pointer hover:bg-muted/80"
+              onClick={() => handleSort("country")}
+            >
+              <div className="flex items-center">
+                Country
+                <SortIcon column="country" />
+              </div>
             </th>
-            <th className="px-4 py-3 text-right text-sm font-medium">Cases</th>
-            <th className="px-4 py-3 text-right text-sm font-medium">Today</th>
-            <th className="px-4 py-3 text-right text-sm font-medium">Deaths</th>
-            <th className="px-4 py-3 text-right text-sm font-medium">Today</th>
-            <th className="px-4 py-3 text-right text-sm font-medium">
-              Recovered
+            <th
+              className="px-4 py-3 text-right text-sm font-medium cursor-pointer hover:bg-muted/80"
+              onClick={() => handleSort("cases")}
+            >
+              <div className="flex items-center justify-end">
+                Cases
+                <SortIcon column="cases" />
+              </div>
             </th>
-            <th className="px-4 py-3 text-right text-sm font-medium">Active</th>
+            <th
+              className="px-4 py-3 text-right text-sm font-medium cursor-pointer hover:bg-muted/80"
+              onClick={() => handleSort("todayCases")}
+            >
+              <div className="flex items-center justify-end">
+                Today
+                <SortIcon column="todayCases" />
+              </div>
+            </th>
+            <th
+              className="px-4 py-3 text-right text-sm font-medium cursor-pointer hover:bg-muted/80"
+              onClick={() => handleSort("deaths")}
+            >
+              <div className="flex items-center justify-end">
+                Deaths
+                <SortIcon column="deaths" />
+              </div>
+            </th>
+            <th
+              className="px-4 py-3 text-right text-sm font-medium cursor-pointer hover:bg-muted/80"
+              onClick={() => handleSort("todayDeaths")}
+            >
+              <div className="flex items-center justify-end">
+                Today
+                <SortIcon column="todayDeaths" />
+              </div>
+            </th>
+            <th
+              className="px-4 py-3 text-right text-sm font-medium cursor-pointer hover:bg-muted/80"
+              onClick={() => handleSort("recovered")}
+            >
+              <div className="flex items-center justify-end">
+                Recovered
+                <SortIcon column="recovered" />
+              </div>
+            </th>
+            <th
+              className="px-4 py-3 text-right text-sm font-medium cursor-pointer hover:bg-muted/80"
+              onClick={() => handleSort("active")}
+            >
+              <div className="flex items-center justify-end">
+                Active
+                <SortIcon column="active" />
+              </div>
+            </th>
             <th className="px-4 py-3 text-right text-sm font-medium">
               Critical
             </th>
@@ -72,7 +149,8 @@ export function CountriesTable({
           {paginatedCountries.map((country) => (
             <tr
               key={country.country}
-              className="hover:bg-muted/50 transition-colors group"
+              className="hover:bg-muted/50 transition-colors group cursor-pointer"
+              onClick={() => onRowClick?.(country)}
             >
               <td className="px-4 py-3 sticky left-0 bg-card group-hover:bg-muted/50 transition-colors z-10 shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
                 <div className="flex items-center gap-2">
@@ -112,7 +190,7 @@ export function CountriesTable({
               </td>
               <td className="px-4 py-3 text-center">
                 <button
-                  onClick={() => handleCopy(country)}
+                  onClick={(e) => handleCopy(country, e)}
                   className={cn(
                     "p-2 rounded-md transition-colors hover:bg-accent",
                     "opacity-0 md:group-hover:opacity-100 md:opacity-100"
