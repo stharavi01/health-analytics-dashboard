@@ -1,27 +1,32 @@
 import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Globe, BarChart3, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "@/lib/toast";
 
 const navItems = [
   {
     to: "/",
     icon: LayoutDashboard,
     label: "Home",
+    implemented: true,
   },
   {
     to: "/countries",
     icon: Globe,
     label: "Data",
+    implemented: true,
   },
   {
     to: "/charts",
     icon: BarChart3,
     label: "Charts",
+    implemented: false,
   },
   {
     to: "/about",
     icon: Info,
     label: "About",
+    implemented: false,
   },
 ];
 
@@ -30,6 +35,15 @@ const navItems = [
  * Hidden on desktop (≥768px)
  */
 export function BottomNav() {
+  const handleNavClick = (e: React.MouseEvent, item: (typeof navItems)[0]) => {
+    if (!item.implemented) {
+      e.preventDefault();
+      toast.info(`${item.label} - Coming Soon!`, {
+        description: "This feature is under development",
+      });
+    }
+  };
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 h-16 bg-card border-t border-border md:hidden">
       <div className="flex h-full items-center justify-around px-2">
@@ -37,12 +51,14 @@ export function BottomNav() {
           <NavLink
             key={item.to}
             to={item.to}
+            onClick={(e) => handleNavClick(e, item)}
             className={({ isActive }) =>
               cn(
                 "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 flex-1 max-w-[100px]",
                 isActive
                   ? "text-primary scale-110"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                !item.implemented && "opacity-70"
               )
             }
           >

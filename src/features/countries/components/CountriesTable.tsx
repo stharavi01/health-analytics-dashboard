@@ -103,7 +103,7 @@ const CountryRow = memo(function CountryRow({
             onClick={(e) => onToggleCompare(country, e)}
             className={cn(
               "p-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              "opacity-0 md:group-hover:opacity-100 md:opacity-100",
+              "opacity-100 md:opacity-0 md:group-hover:opacity-100",
               isSelected
                 ? "bg-primary text-primary-foreground hover:bg-primary/90"
                 : "hover:bg-accent"
@@ -122,7 +122,7 @@ const CountryRow = memo(function CountryRow({
             onClick={(e) => onCopy(country, e)}
             className={cn(
               "p-2 rounded-md transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              "opacity-0 md:group-hover:opacity-100 md:opacity-100"
+              "opacity-100 md:opacity-0 md:group-hover:opacity-100"
             )}
             aria-label={`Copy ${country.country} data to clipboard`}
             title="Copy data to clipboard"
@@ -223,16 +223,16 @@ export function CountriesTable({
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-auto max-h-[calc(100vh-280px)]">
       <table
         className="w-full"
         role="table"
         aria-label="Countries COVID-19 data table"
       >
-        <thead className="bg-muted sticky top-0 z-10">
+        <thead className="bg-muted sticky top-0 z-20 shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
           <tr>
             <th
-              className="px-4 py-3 text-left text-sm font-medium sticky left-0 bg-muted z-20 cursor-pointer hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="px-4 py-3 text-left text-sm font-medium sticky left-0 bg-muted z-30 cursor-pointer hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-[2px_0_4px_rgba(0,0,0,0.05)]"
               onClick={() => handleSort("country")}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
