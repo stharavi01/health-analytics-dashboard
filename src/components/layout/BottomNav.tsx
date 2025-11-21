@@ -38,7 +38,9 @@ export function BottomNav() {
   const handleNavClick = (e: React.MouseEvent, item: (typeof navItems)[0]) => {
     if (!item.implemented) {
       e.preventDefault();
-      toast.info(`${item.label} - Coming Soon! This feature is under development.`);
+      toast.info(
+        `${item.label} - Coming Soon! This feature is under development.`
+      );
     }
   };
 
