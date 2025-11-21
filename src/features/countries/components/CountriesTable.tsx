@@ -17,7 +17,6 @@ import {
   addCountryToComparison,
   removeCountryFromComparison,
 } from "@/features/filters/filtersSlice";
-import { Button } from "@/components/ui/button";
 
 interface CountriesTableProps {
   countries: Country[];

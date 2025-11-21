@@ -122,7 +122,7 @@ function TableCell({ children, className, align = "left" }: TableCellProps) {
   );
 }
 
-export const Table = Object.assign(Root, {
+export const Table = Object.assign(TableRoot, {
   Header: TableHeader,
   Body: TableBody,
   Row: TableRow,
