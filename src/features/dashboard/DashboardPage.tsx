@@ -13,7 +13,7 @@ import { DistributionPieChart } from "./components/DistributionPieChart";
 import { ExportButton } from "./components/ExportButton";
 import { LoadingState, ErrorState } from "@/components/common";
 import { DateRangeFilter } from "../filters/components/DateRangeFilter";
-import { useAppSelector } from "@/app/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { selectFilters } from "../filters/filtersSlice";
 import { DATE_RANGE_PRESETS } from "@/constants/api.constants";
 

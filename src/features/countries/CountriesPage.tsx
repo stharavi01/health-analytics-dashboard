@@ -1,6 +1,6 @@
 import { useGetCountriesQuery } from "./api/countriesApi";
-import { useAppSelector, useAppDispatch } from "@/app/hooks";
-import { useDebounce } from "@/app/hooks/useDebounce";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
   setSearch,
   setContinent,

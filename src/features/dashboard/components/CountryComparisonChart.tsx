@@ -13,7 +13,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import type { Country } from "../../countries/types/country.types";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   removeCountryFromComparison,
   clearComparison,

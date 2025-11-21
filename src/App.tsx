@@ -3,7 +3,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AppLayout } from "./components/layout/AppLayout";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { Provider } from "react-redux";
-import { store } from "./app/store";
+import { store } from "@/store/store";
 import { CountriesPage } from "./features/countries/CountriesPage";
 import { ThemeProvider } from "next-themes";
 
