@@ -1,10 +1,23 @@
 import { useState, memo } from "react";
-import { Copy, Check, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  Copy,
+  Check,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  GitCompare,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Country } from "../types/country.types";
 import { toast } from "@/lib/toast";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { setSort, selectFilters } from "@/features/filters/filtersSlice";
+import {
+  setSort,
+  selectFilters,
+  addCountryToComparison,
+  removeCountryFromComparison,
+} from "@/features/filters/filtersSlice";
+import { Button } from "@/components/ui/button";
 
 interface CountriesTableProps {
   countries: Country[];
@@ -21,6 +34,8 @@ interface CountryRowProps {
   onCopy: (country: Country, e: React.MouseEvent) => void;
   onClick?: (country: Country) => void;
   copiedId: string | null;
+  isSelected: boolean;
+  onToggleCompare: (country: Country, e: React.MouseEvent) => void;
 }
 
 const CountryRow = memo(function CountryRow({
@@ -28,6 +43,8 @@ const CountryRow = memo(function CountryRow({
   onCopy,
   onClick,
   copiedId,
+  isSelected,
+  onToggleCompare,
 }: CountryRowProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -82,21 +99,45 @@ const CountryRow = memo(function CountryRow({
         {country.tests.toLocaleString()}
       </td>
       <td className="px-4 py-3 text-center">
-        <button
-          onClick={(e) => onCopy(country, e)}
-          className={cn(
-            "p-2 rounded-md transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            "opacity-0 md:group-hover:opacity-100 md:opacity-100"
-          )}
-          aria-label={`Copy ${country.country} data to clipboard`}
-          title="Copy data to clipboard"
-        >
-          {copiedId === country.country ? (
-            <Check className="h-4 w-4 text-green-600" aria-label="Copied" />
-          ) : (
-            <Copy className="h-4 w-4 text-muted-foreground" aria-label="Copy" />
-          )}
-        </button>
+        <div className="flex items-center justify-center gap-1">
+          <button
+            onClick={(e) => onToggleCompare(country, e)}
+            className={cn(
+              "p-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "opacity-0 md:group-hover:opacity-100 md:opacity-100",
+              isSelected
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "hover:bg-accent"
+            )}
+            aria-label={`${isSelected ? "Remove from" : "Add to"} comparison`}
+            title={`${isSelected ? "Remove from" : "Add to"} comparison`}
+          >
+            <GitCompare
+              className={cn(
+                "h-4 w-4",
+                isSelected ? "text-primary-foreground" : "text-muted-foreground"
+              )}
+            />
+          </button>
+          <button
+            onClick={(e) => onCopy(country, e)}
+            className={cn(
+              "p-2 rounded-md transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "opacity-0 md:group-hover:opacity-100 md:opacity-100"
+            )}
+            aria-label={`Copy ${country.country} data to clipboard`}
+            title="Copy data to clipboard"
+          >
+            {copiedId === country.country ? (
+              <Check className="h-4 w-4 text-green-600" aria-label="Copied" />
+            ) : (
+              <Copy
+                className="h-4 w-4 text-muted-foreground"
+                aria-label="Copy"
+              />
+            )}
+          </button>
+        </div>
       </td>
     </tr>
   );
@@ -134,6 +175,7 @@ export function CountriesTable({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectFilters);
+  const { selectedCountriesForComparison } = filters;
 
   // Calculate paginated data
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -156,6 +198,21 @@ export function CountriesTable({
       setTimeout(() => setCopiedId(null), 2000);
     } catch {
       toast.error("Failed to copy");
+    }
+  };
+
+  const handleToggleCompare = (country: Country, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (selectedCountriesForComparison.includes(country.country)) {
+      dispatch(removeCountryFromComparison(country.country));
+      toast.success(`${country.country} removed from comparison`);
+    } else {
+      if (selectedCountriesForComparison.length >= 5) {
+        toast.error("Maximum 5 countries can be compared");
+        return;
+      }
+      dispatch(addCountryToComparison(country.country));
+      toast.success(`${country.country} added to comparison`);
     }
   };
 
@@ -382,6 +439,10 @@ export function CountriesTable({
               onCopy={handleCopy}
               onClick={onRowClick}
               copiedId={copiedId}
+              isSelected={selectedCountriesForComparison.includes(
+                country.country
+              )}
+              onToggleCompare={handleToggleCompare}
             />
           ))}
         </tbody>

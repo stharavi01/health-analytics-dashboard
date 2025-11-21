@@ -8,6 +8,8 @@ export const API_ENDPOINTS = {
   GLOBAL: "/all",
   COUNTRIES: "/countries",
   HISTORICAL: "/historical",
+  HISTORICAL_ALL: "/historical/all",
+  HISTORICAL_COUNTRY: (country: string) => `/historical/${country}`,
 } as const;
 
 export const CACHE_TIME = {
@@ -27,3 +29,17 @@ export const CONTINENTS = [
 ] as const;
 
 export type Continent = (typeof CONTINENTS)[number];
+
+/**
+ * Date range presets for filtering historical data
+ */
+export const DATE_RANGE_PRESETS = {
+  LAST_7_DAYS: { label: "Last 7 Days", days: 7 },
+  LAST_30_DAYS: { label: "Last 30 Days", days: 30 },
+  LAST_90_DAYS: { label: "Last 90 Days", days: 90 },
+  LAST_6_MONTHS: { label: "Last 6 Months", days: 180 },
+  LAST_YEAR: { label: "Last Year", days: 365 },
+  ALL_TIME: { label: "All Time", days: "all" },
+} as const;
+
+export type DateRangePreset = keyof typeof DATE_RANGE_PRESETS;

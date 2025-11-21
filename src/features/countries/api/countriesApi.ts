@@ -5,7 +5,12 @@ import {
   API_ENDPOINTS,
   CACHE_TIME,
 } from "@/constants/api.constants";
-import type { Country, GlobalStats } from "../types/country.types";
+import type {
+  Country,
+  GlobalStats,
+  HistoricalData,
+  GlobalHistoricalData,
+} from "../types/country.types";
 
 /**
  * RTK Query API slice using Axios for HTTP requests
@@ -38,6 +43,39 @@ export const countriesApi = createApi({
         method: "GET",
       }),
     }),
+
+    /**
+     * Fetch global historical COVID-19 data
+     * @param lastdays - Number of days to fetch (default: 30, "all" for all data)
+     * @returns Global historical timeline data
+     */
+    getGlobalHistorical: builder.query<
+      GlobalHistoricalData,
+      number | "all" | void
+    >({
+      query: (lastdays = 30) => ({
+        url: API_ENDPOINTS.HISTORICAL_ALL,
+        method: "GET",
+        params: { lastdays },
+      }),
+    }),
+
+    /**
+     * Fetch historical COVID-19 data for a specific country
+     * @param country - Country name
+     * @param lastdays - Number of days to fetch (default: 30)
+     * @returns Country-specific historical timeline data
+     */
+    getCountryHistorical: builder.query<
+      HistoricalData,
+      { country: string; lastdays?: number | "all" }
+    >({
+      query: ({ country, lastdays = 30 }) => ({
+        url: API_ENDPOINTS.HISTORICAL_COUNTRY(country),
+        method: "GET",
+        params: { lastdays },
+      }),
+    }),
   }),
 });
 
@@ -45,4 +83,9 @@ export const countriesApi = createApi({
  * Auto-generated hooks for each endpoint
  * Use these hooks in components to fetch data
  */
-export const { useGetGlobalStatsQuery, useGetCountriesQuery } = countriesApi;
+export const {
+  useGetGlobalStatsQuery,
+  useGetCountriesQuery,
+  useGetGlobalHistoricalQuery,
+  useGetCountryHistoricalQuery,
+} = countriesApi;

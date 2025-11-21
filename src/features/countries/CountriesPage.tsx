@@ -70,9 +70,9 @@ export function CountriesPage() {
     if (!countries || countries.length === 0)
       return { maxCases: 100000000, maxDeaths: 10000000, maxActive: 50000000 };
 
-    const maxCases = Math.max(...countries.map((c) => c.cases));
-    const maxDeaths = Math.max(...countries.map((c) => c.deaths));
-    const maxActive = Math.max(...countries.map((c) => c.active));
+    const maxCases = Math.max(...countries.map((c: Country) => c.cases));
+    const maxDeaths = Math.max(...countries.map((c: Country) => c.deaths));
+    const maxActive = Math.max(...countries.map((c: Country) => c.active));
 
     return { maxCases, maxDeaths, maxActive };
   }, [countries]);
