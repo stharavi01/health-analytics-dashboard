@@ -38,14 +38,14 @@ const CountryRow = memo(function CountryRow({
 
   return (
     <tr
-      className="hover:bg-muted/50 transition-colors group cursor-pointer"
+      className="hover:bg-muted/50 transition-colors group cursor-pointer bg-background"
       onClick={() => onClick?.(country)}
       role="button"
       tabIndex={0}
       onKeyDown={handleKeyDown}
       aria-label={`View details for ${country.country}`}
     >
-      <td className="px-4 py-3 sticky left-0 bg-card group-hover:bg-muted/50 transition-colors z-10 shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
+      <td className="px-4 py-3 sticky left-0 bg-background group-hover:bg-muted/50 transition-colors z-10 shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
         <div className="flex items-center gap-2">
           <img
             src={country.countryInfo.flag}

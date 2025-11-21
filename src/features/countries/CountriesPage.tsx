@@ -200,7 +200,7 @@ export function CountriesPage() {
         `covid-data-${new Date().toISOString().split("T")[0]}.csv`
       );
       toast.success(`Exported ${filteredCountries.length} countries to CSV`);
-    } catch (error) {
+    } catch {
       toast.error("Failed to export data");
     }
   };
@@ -240,41 +240,49 @@ export function CountriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0">
         <div>
-          <h1 className="text-3xl font-bold">Countries Data</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold">Countries Data</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Showing {filteredCountries.length} of {countries?.length || 0}{" "}
             countries
           </p>
         </div>
-        <Button onClick={handleExport} variant="outline" size="sm">
+        <Button
+          onClick={handleExport}
+          variant="outline"
+          size="sm"
+          className="w-full sm:w-auto"
+        >
           <Download className="h-4 w-4 mr-2" />
           Export CSV
         </Button>
       </div>
 
       {/* Basic Filters */}
-      <Card className="p-4">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search countries..."
-                value={filters.search}
-                onChange={(e) => dispatch(setSearch(e.target.value))}
-                className="pl-10"
-              />
-            </div>
+      <Card className="p-3 sm:p-4">
+        <div className="flex flex-col gap-3">
+          {/* Search bar - full width on mobile */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search countries..."
+              value={filters.search}
+              onChange={(e) => dispatch(setSearch(e.target.value))}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Filters row - compact on mobile, 2-3 items per row */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             <Select
               value={filters.continent}
               onValueChange={(value) =>
                 dispatch(setContinent(value as typeof filters.continent))
               }
             >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select continent" />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Continent" />
               </SelectTrigger>
               <SelectContent>
                 {CONTINENTS.map((continent) => (
@@ -290,23 +298,24 @@ export function CountriesPage() {
                 dispatch(setSeverity(value as typeof filters.severity))
               }
             >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select severity" />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Severity" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="All">All Severity</SelectItem>
-                <SelectItem value="Low">Low (&lt; 100k)</SelectItem>
-                <SelectItem value="Medium">Medium (100k - 1M)</SelectItem>
-                <SelectItem value="High">High (&gt; 1M)</SelectItem>
+                <SelectItem value="All">All</SelectItem>
+                <SelectItem value="Low">Low</SelectItem>
+                <SelectItem value="Medium">Medium</SelectItem>
+                <SelectItem value="High">High</SelectItem>
               </SelectContent>
             </Select>
             <Button
               variant={showAdvancedFilters ? "default" : "outline"}
               size="sm"
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="col-span-2 sm:col-span-1"
             >
-              <Filter className="h-4 w-4 mr-2" />
-              Ranges
+              <Filter className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Ranges</span>
               {activeFilterChips.length > 0 && (
                 <span className="ml-2 px-1.5 py-0.5 text-xs bg-primary-foreground text-primary rounded-full">
                   {activeFilterChips.length}
