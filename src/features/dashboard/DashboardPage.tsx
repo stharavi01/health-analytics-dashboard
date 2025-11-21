@@ -10,6 +10,7 @@ import { KPICard } from "./components/KPICard";
 import { TopCountriesChart } from "./components/TopCountriesChart";
 import { TrendLineChart } from "./components/TrendLineChart";
 import { DistributionPieChart } from "./components/DistributionPieChart";
+import { CountryComparisonChart } from "./components/CountryComparisonChart";
 import { ExportButton } from "./components/ExportButton";
 import { LoadingState, ErrorState } from "@/components/common";
 import { DateRangeFilter } from "../filters/components/DateRangeFilter";
@@ -229,6 +230,9 @@ export function DashboardPage() {
 
       {/* Chart */}
       <TopCountriesChart countries={filteredCountries} />
+
+      {/* Country Comparison Chart */}
+      <CountryComparisonChart countries={filteredCountries} />
 
       {/* Enhanced Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

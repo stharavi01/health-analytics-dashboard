@@ -64,15 +64,9 @@ export function CountryComparisonChart({
       .filter(Boolean);
   }, [countries, selectedCountriesForComparison]);
 
+  // Don't render anything if no countries are selected
   if (!selectedCountriesForComparison.length) {
-    return (
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Country Comparison</h2>
-        <p className="text-muted-foreground text-center py-8">
-          Select countries from the table to compare their statistics
-        </p>
-      </Card>
-    );
+    return null;
   }
 
   return (

@@ -28,6 +28,7 @@ import { useMemo, useState, useRef, useEffect } from "react";
 import { CONTINENTS } from "@/constants/api.constants";
 import { CountriesTable } from "./components/CountriesTable";
 import { TablePagination } from "./components/TablePagination";
+import { CountryComparisonChart } from "@/features/dashboard/components/CountryComparisonChart";
 import { FilterChips } from "@/features/filters/components/FilterChips";
 import { RangeFilter } from "@/features/filters/components/RangeFilter";
 import { CountryDetailsDrawer } from "./components/CountryDetailsDrawer";
@@ -403,6 +404,9 @@ export function CountriesPage() {
           )}
         </div>
       </Card>
+
+      {/* Country Comparison Chart */}
+      <CountryComparisonChart countries={filteredCountries} />
 
       {/* Table with sticky pagination */}
       <Card className="overflow-hidden flex flex-col h-[calc(100vh-20rem)]">
