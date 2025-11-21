@@ -51,7 +51,7 @@ export function TopCountriesChart({
             height={100}
             className="text-xs fill-muted-foreground"
           />
-          <YAxis className="text-xs fill-muted-foreground" />
+          <YAxis className="text-xs fill-muted-foreground" width={80} />
           <Tooltip
             contentStyle={{
               backgroundColor: "hsl(var(--card))",

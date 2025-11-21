@@ -85,3 +85,38 @@ export interface HistoricalData {
     recovered: HistoricalDataPoint;
   };
 }
+
+/**
+ * Global historical data
+ */
+export interface GlobalHistoricalData {
+  cases: HistoricalDataPoint;
+  deaths: HistoricalDataPoint;
+  recovered: HistoricalDataPoint;
+}
+
+/**
+ * Formatted time series data point for charts
+ */
+export interface TimeSeriesDataPoint {
+  date: string;
+  cases: number;
+  deaths: number;
+  recovered: number;
+  active?: number;
+}
+
+/**
+ * Country comparison data
+ */
+export interface CountryComparison {
+  country: string;
+  cases: number;
+  deaths: number;
+  recovered: number;
+  active: number;
+  casesPerMillion: number;
+  deathsPerMillion: number;
+  recoveryRate: number;
+  fatalityRate: number;
+}

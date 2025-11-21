@@ -1,10 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" suppressHydrationWarning>
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>health-analytics-dashboard</title>
+    <script>
+      // Prevent flash of unstyled content (FOUC) by applying theme before render
+      (function() {
+        const theme = localStorage.getItem('theme') || 'system';
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const appliedTheme = theme === 'system' ? systemTheme : theme;
+        
+        if (appliedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

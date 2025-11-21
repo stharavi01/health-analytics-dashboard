@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, FileQuestion } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface EmptyStateProps {
@@ -20,7 +20,6 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   // Use default icon if none provided
-  const { FileQuestion } = require("lucide-react");
   const DisplayIcon = Icon || FileQuestion;
 
   return (

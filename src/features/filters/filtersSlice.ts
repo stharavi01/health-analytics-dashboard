@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { Continent } from "@/constants/api.constants";
+import type { Continent, DateRangePreset } from "@/constants/api.constants";
 
 /**
  * Severity levels based on case counts
@@ -16,6 +16,11 @@ export interface FiltersState {
   casesRange: [number, number];
   deathsRange: [number, number];
   activeRange: [number, number];
+  recoveryRateRange: [number, number];
+  fatalityRateRange: [number, number];
+  dateRangePreset: DateRangePreset | "custom";
+  customDateRange: { start: Date | null; end: Date | null };
+  selectedCountriesForComparison: string[];
   sortBy:
     | "country"
     | "cases"
@@ -27,6 +32,8 @@ export interface FiltersState {
   sortOrder: "asc" | "desc";
   currentPage: number;
   itemsPerPage: number;
+  autoRefresh: boolean;
+  refreshInterval: number; // in seconds
 }
 
 /**
@@ -81,10 +88,17 @@ const initialState: FiltersState = {
   casesRange: [0, 100000000],
   deathsRange: [0, 10000000],
   activeRange: [0, 50000000],
+  recoveryRateRange: [0, 100],
+  fatalityRateRange: [0, 100],
+  dateRangePreset: "LAST_30_DAYS",
+  customDateRange: { start: null, end: null },
+  selectedCountriesForComparison: [],
   sortBy: "cases",
   sortOrder: "desc",
   currentPage: 1,
   itemsPerPage: 10,
+  autoRefresh: false,
+  refreshInterval: 300, // 5 minutes
   ...loadFromLocalStorage(),
 };
 
@@ -144,6 +158,86 @@ export const filtersSlice = createSlice({
     },
 
     /**
+     * Set recovery rate range filter
+     */
+    setRecoveryRateRange: (state, action: PayloadAction<[number, number]>) => {
+      state.recoveryRateRange = action.payload;
+      state.currentPage = 1;
+    },
+
+    /**
+     * Set fatality rate range filter
+     */
+    setFatalityRateRange: (state, action: PayloadAction<[number, number]>) => {
+      state.fatalityRateRange = action.payload;
+      state.currentPage = 1;
+    },
+
+    /**
+     * Set date range preset
+     */
+    setDateRangePreset: (
+      state,
+      action: PayloadAction<DateRangePreset | "custom">
+    ) => {
+      state.dateRangePreset = action.payload;
+      if (action.payload !== "custom") {
+        state.customDateRange = { start: null, end: null };
+      }
+    },
+
+    /**
+     * Set custom date range
+     */
+    setCustomDateRange: (
+      state,
+      action: PayloadAction<{ start: Date | null; end: Date | null }>
+    ) => {
+      state.customDateRange = action.payload;
+      state.dateRangePreset = "custom";
+    },
+
+    /**
+     * Add country to comparison
+     */
+    addCountryToComparison: (state, action: PayloadAction<string>) => {
+      if (!state.selectedCountriesForComparison.includes(action.payload)) {
+        state.selectedCountriesForComparison.push(action.payload);
+      }
+    },
+
+    /**
+     * Remove country from comparison
+     */
+    removeCountryFromComparison: (state, action: PayloadAction<string>) => {
+      state.selectedCountriesForComparison =
+        state.selectedCountriesForComparison.filter(
+          (c) => c !== action.payload
+        );
+    },
+
+    /**
+     * Clear comparison countries
+     */
+    clearComparison: (state) => {
+      state.selectedCountriesForComparison = [];
+    },
+
+    /**
+     * Toggle auto refresh
+     */
+    toggleAutoRefresh: (state) => {
+      state.autoRefresh = !state.autoRefresh;
+    },
+
+    /**
+     * Set refresh interval
+     */
+    setRefreshInterval: (state, action: PayloadAction<number>) => {
+      state.refreshInterval = action.payload;
+    },
+
+    /**
      * Set sort column and order
      */
     setSort: (
@@ -193,6 +287,15 @@ export const {
   setCasesRange,
   setDeathsRange,
   setActiveRange,
+  setRecoveryRateRange,
+  setFatalityRateRange,
+  setDateRangePreset,
+  setCustomDateRange,
+  addCountryToComparison,
+  removeCountryFromComparison,
+  clearComparison,
+  toggleAutoRefresh,
+  setRefreshInterval,
   setSort,
   setCurrentPage,
   setItemsPerPage,

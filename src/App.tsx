@@ -13,7 +13,13 @@ import { ThemeProvider } from "next-themes";
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        storageKey="theme"
+        disableTransitionOnChange
+      >
         <Provider store={store}>
           <BrowserRouter>
             <Routes>
