@@ -13,7 +13,7 @@ import { DistributionPieChart } from "./components/DistributionPieChart";
 import { ExportButton } from "./components/ExportButton";
 import { LoadingState, ErrorState } from "@/components/common";
 import { DateRangeFilter } from "../filters/components/DateRangeFilter";
-import { useAppSelector } from "@/app/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { selectFilters } from "../filters/filtersSlice";
 import { DATE_RANGE_PRESETS } from "@/constants/api.constants";
 
@@ -46,18 +46,15 @@ export function DashboardPage() {
     refetch: refetchHistorical,
   } = useGetGlobalHistoricalQuery(historicalDays);
 
-  // Filter countries based on active filters
   const filteredCountries = useMemo(() => {
     if (!countries) return [];
 
-    let filtered = [...countries];
+    let filtered = [...(countries || [])];
 
-    // Apply continent filter
     if (filters.continent !== "All") {
       filtered = filtered.filter((c) => c.continent === filters.continent);
     }
 
-    // Apply severity filter
     if (filters.severity !== "All") {
       const getSeverity = (cases: number): "Low" | "Medium" | "High" => {
         if (cases < 100000) return "Low";
@@ -69,25 +66,21 @@ export function DashboardPage() {
       );
     }
 
-    // Apply cases range filter
     filtered = filtered.filter(
       (c) =>
         c.cases >= filters.casesRange[0] && c.cases <= filters.casesRange[1]
     );
 
-    // Apply deaths range filter
     filtered = filtered.filter(
       (c) =>
         c.deaths >= filters.deathsRange[0] && c.deaths <= filters.deathsRange[1]
     );
 
-    // Apply active range filter
     filtered = filtered.filter(
       (c) =>
         c.active >= filters.activeRange[0] && c.active <= filters.activeRange[1]
     );
 
-    // Apply recovery rate filter
     filtered = filtered.filter((c) => {
       const recoveryRate = c.recovered > 0 ? (c.recovered / c.cases) * 100 : 0;
       return (
@@ -96,7 +89,6 @@ export function DashboardPage() {
       );
     });
 
-    // Apply fatality rate filter
     filtered = filtered.filter((c) => {
       const fatalityRate = c.deaths > 0 ? (c.deaths / c.cases) * 100 : 0;
       return (
@@ -108,7 +100,6 @@ export function DashboardPage() {
     return filtered;
   }, [countries, filters]);
 
-  // Calculate aggregated stats from filtered countries
   const filteredStats = useMemo(() => {
     if (!filteredCountries.length) {
       return {
@@ -144,7 +135,6 @@ export function DashboardPage() {
     );
   }, [filteredCountries]);
 
-  // Manual refetch all data
   const refetchAll = () => {
     refetchGlobal();
     refetchCountries();
@@ -186,18 +176,20 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">COVID-19 Global Dashboard</h1>
-          <p className="text-muted-foreground mt-2">
-            Last updated: {new Date(data.updated).toLocaleString()}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <DateRangeFilter />
-          <ExportButton
-            data={{ countries: filteredCountries, globalStats: data }}
-          />
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">COVID-19 Global Dashboard</h1>
+            <p className="text-muted-foreground mt-2">
+              Last updated: {new Date(data.updated).toLocaleString()}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <DateRangeFilter />
+            <ExportButton
+              data={{ countries: filteredCountries, globalStats: data }}
+            />
+          </div>
         </div>
       </div>
 

@@ -9,9 +9,6 @@ export interface LoadingStateProps {
   className?: string;
 }
 
-/**
- * Reusable loading state component with skeleton patterns
- */
 export function LoadingState({
   type = "custom",
   rows = 5,

@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setDateRangePreset, selectFilters } from "../filtersSlice";
 import {
   DATE_RANGE_PRESETS,
@@ -30,10 +30,10 @@ export function DateRangeFilter() {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <Calendar className="h-4 w-4 text-muted-foreground" />
+    <div className="flex items-center gap-1.5 flex-1">
+      <Calendar className="h-3.5 w-3.5 text-muted-foreground hidden sm:block flex-shrink-0" />
       <Select value={dateRangePreset} onValueChange={handlePresetChange}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="h-8 flex-1 text-xs sm:text-sm">
           <SelectValue placeholder="Select date range" />
         </SelectTrigger>
         <SelectContent>

@@ -1,7 +1,3 @@
-/**
- * API Configuration and Constants
- */
-
 export const API_BASE_URL = "https://disease.sh/v3/covid-19";
 
 export const API_ENDPOINTS = {
@@ -13,9 +9,9 @@ export const API_ENDPOINTS = {
 } as const;
 
 export const CACHE_TIME = {
-  SHORT: 60, // 1 minute
-  MEDIUM: 300, // 5 minutes
-  LONG: 3600, // 1 hour
+  SHORT: 60,
+  MEDIUM: 300,
+  LONG: 3600,
 } as const;
 
 export const CONTINENTS = [

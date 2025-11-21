@@ -1,6 +1,6 @@
 import { useGetCountriesQuery } from "./api/countriesApi";
-import { useAppSelector, useAppDispatch } from "@/app/hooks";
-import { useDebounce } from "@/app/hooks/useDebounce";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
   setSearch,
   setContinent,
@@ -44,9 +44,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-/**
- * Countries Page - Displays COVID-19 data for all countries with filters
- */
 export function CountriesPage() {
   const { data: countries, isLoading, error, refetch } = useGetCountriesQuery();
   const filters = useAppSelector(selectFilters);
@@ -55,17 +52,14 @@ export function CountriesPage() {
   const [rangeFiltersOpen, setRangeFiltersOpen] = useState(false);
   const tableScrollRef = useRef<HTMLDivElement>(null);
 
-  // Debounce search input
   const debouncedSearch = useDebounce(filters.search, 300);
 
-  // Scroll to top when page changes
   useEffect(() => {
     if (tableScrollRef.current) {
       tableScrollRef.current.scrollTop = 0;
     }
   }, [filters.currentPage]);
 
-  // Calculate min/max values for range filters
   const rangeStats = useMemo(() => {
     if (!countries || countries.length === 0)
       return { maxCases: 100000000, maxDeaths: 10000000, maxActive: 50000000 };
@@ -77,25 +71,21 @@ export function CountriesPage() {
     return { maxCases, maxDeaths, maxActive };
   }, [countries]);
 
-  // Get severity category for a country
   const getSeverity = (cases: number): "Low" | "Medium" | "High" => {
     if (cases < 100000) return "Low";
     if (cases < 1000000) return "Medium";
     return "High";
   };
 
-  // Filter and sort countries
   const filteredCountries = useMemo(() => {
     if (!countries) return [];
 
     let filtered = [...countries];
 
-    // Apply continent filter
     if (filters.continent !== "All") {
       filtered = filtered.filter((c) => c.continent === filters.continent);
     }
 
-    // Apply search filter (debounced)
     if (debouncedSearch) {
       const searchLower = debouncedSearch.toLowerCase();
       filtered = filtered.filter((c) =>
@@ -103,32 +93,27 @@ export function CountriesPage() {
       );
     }
 
-    // Apply severity filter
     if (filters.severity !== "All") {
       filtered = filtered.filter(
         (c) => getSeverity(c.cases) === filters.severity
       );
     }
 
-    // Apply cases range filter
     filtered = filtered.filter(
       (c) =>
         c.cases >= filters.casesRange[0] && c.cases <= filters.casesRange[1]
     );
 
-    // Apply deaths range filter
     filtered = filtered.filter(
       (c) =>
         c.deaths >= filters.deathsRange[0] && c.deaths <= filters.deathsRange[1]
     );
 
-    // Apply active range filter
     filtered = filtered.filter(
       (c) =>
         c.active >= filters.activeRange[0] && c.active <= filters.activeRange[1]
     );
 
-    // Apply sorting
     filtered.sort((a, b) => {
       const aValue = a[filters.sortBy];
       const bValue = b[filters.sortBy];
@@ -147,7 +132,6 @@ export function CountriesPage() {
     return filtered;
   }, [countries, filters, debouncedSearch]);
 
-  // Get active filter chips
   const activeFilterChips = useMemo(() => {
     const chips = [];
 
@@ -208,7 +192,6 @@ export function CountriesPage() {
     return chips;
   }, [filters, rangeStats, dispatch]);
 
-  // Handle CSV export
   const handleExport = () => {
     try {
       exportToCSV(
@@ -221,7 +204,6 @@ export function CountriesPage() {
     }
   };
 
-  // Handle clear all filters
   const handleClearAllFilters = () => {
     dispatch(resetFilters());
   };

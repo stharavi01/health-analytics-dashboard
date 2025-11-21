@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { Country } from "../types/country.types";
 import { toast } from "@/lib/toast";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   setSort,
   selectFilters,
@@ -177,7 +177,6 @@ export function CountriesTable({
   const filters = useAppSelector(selectFilters);
   const { selectedCountriesForComparison } = filters;
 
-  // Calculate paginated data
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedCountries = countries.slice(startIndex, endIndex);
