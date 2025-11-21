@@ -1,20 +1,21 @@
 /**
- * Type definitions for COVID-19 data
+ * COVID-19 Data Type Definitions
+ * Based on disease.sh API response structure
  */
 
-export interface CountryInfo {
-  _id: number;
-  iso2: string;
-  iso3: string;
-  lat: number;
-  long: number;
-  flag: string;
-}
-
+/**
+ * Country-specific COVID-19 data
+ */
 export interface Country {
-  updated: number;
   country: string;
-  countryInfo: CountryInfo;
+  countryInfo: {
+    _id: number;
+    iso2: string;
+    iso3: string;
+    lat: number;
+    long: number;
+    flag: string;
+  };
   cases: number;
   todayCases: number;
   deaths: number;
@@ -35,10 +36,13 @@ export interface Country {
   activePerOneMillion: number;
   recoveredPerOneMillion: number;
   criticalPerOneMillion: number;
+  updated: number;
 }
 
+/**
+ * Global COVID-19 statistics
+ */
 export interface GlobalStats {
-  updated: number;
   cases: number;
   todayCases: number;
   deaths: number;
@@ -59,27 +63,25 @@ export interface GlobalStats {
   recoveredPerOneMillion: number;
   criticalPerOneMillion: number;
   affectedCountries: number;
+  updated: number;
 }
 
-export type SortDirection = "asc" | "desc";
+/**
+ * Historical data point
+ */
+export interface HistoricalDataPoint {
+  [date: string]: number;
+}
 
-export type SortField = keyof Pick<
-  Country,
-  | "country"
-  | "cases"
-  | "deaths"
-  | "recovered"
-  | "active"
-  | "critical"
-  | "tests"
-  | "population"
->;
-
-export interface FilterState {
-  search: string;
-  continent: string;
-  sortField: SortField;
-  sortDirection: SortDirection;
-  page: number;
-  pageSize: number;
+/**
+ * Historical data for a country
+ */
+export interface HistoricalData {
+  country: string;
+  province?: string[];
+  timeline: {
+    cases: HistoricalDataPoint;
+    deaths: HistoricalDataPoint;
+    recovered: HistoricalDataPoint;
+  };
 }
