@@ -5,6 +5,7 @@ import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
 import { CountriesPage } from "./features/countries/CountriesPage";
+import { ThemeProvider } from "next-themes";
 
 /**
  * Main App component with routing
@@ -12,16 +13,18 @@ import { CountriesPage } from "./features/countries/CountriesPage";
 function App() {
   return (
     <ErrorBoundary>
-      <Provider store={store}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<AppLayout />}>
-              <Route index element={<DashboardPage />} />
-              <Route path="countries" element={<CountriesPage />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </Provider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <Provider store={store}>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<AppLayout />}>
+                <Route index element={<DashboardPage />} />
+                <Route path="countries" element={<CountriesPage />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </Provider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
