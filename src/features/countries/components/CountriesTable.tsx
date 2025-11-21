@@ -1,231 +1,136 @@
-import { useMemo } from "react";
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { toggleSortDirection } from "@/features/filters/filtersSlice";
-import { Country, SortField } from "../types/country.types";
-import { formatNumber } from "@/lib/utils";
+import { useState } from "react";
+import { Copy, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { Country } from "../types/country.types";
+import { toast } from "@/lib/toast";
 
 interface CountriesTableProps {
   countries: Country[];
+  currentPage: number;
+  itemsPerPage: number;
 }
 
 /**
- * Countries table with sorting
+ * Enhanced countries table with copy-to-clipboard, sticky columns, and more data
  */
-export function CountriesTable({ countries }: CountriesTableProps) {
-  const dispatch = useAppDispatch();
-  const { search, continent, sortField, sortDirection, page, pageSize } =
-    useAppSelector((state) => state.filters);
+export function CountriesTable({
+  countries,
+  currentPage,
+  itemsPerPage,
+}: CountriesTableProps) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Filter and sort countries
-  const filteredAndSortedCountries = useMemo(() => {
-    let filtered = [...countries];
+  // Calculate paginated data
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCountries = countries.slice(startIndex, endIndex);
 
-    // Apply search filter
-    if (search) {
-      filtered = filtered.filter((country) =>
-        country.country.toLowerCase().includes(search.toLowerCase())
-      );
+  const handleCopy = async (country: Country) => {
+    try {
+      const data = {
+        country: country.country,
+        cases: country.cases,
+        deaths: country.deaths,
+        recovered: country.recovered,
+        active: country.active,
+      };
+      await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+      setCopiedId(country.country);
+      toast.success("Data copied to clipboard!");
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      toast.error("Failed to copy");
     }
-
-    // Apply continent filter
-    if (continent !== "All") {
-      filtered = filtered.filter((country) => country.continent === continent);
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        return sortDirection === "asc"
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
-      }
-
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-      }
-
-      return 0;
-    });
-
-    return filtered;
-  }, [countries, search, continent, sortField, sortDirection]);
-
-  // Paginate
-  const paginatedCountries = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return filteredAndSortedCountries.slice(startIndex, startIndex + pageSize);
-  }, [filteredAndSortedCountries, page, pageSize]);
-
-  const handleSort = (field: SortField) => {
-    dispatch(toggleSortDirection(field));
-  };
-
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) {
-      return <ArrowUpDown className="h-4 w-4" />;
-    }
-    return sortDirection === "asc" ? (
-      <ArrowUp className="h-4 w-4" />
-    ) : (
-      <ArrowDown className="h-4 w-4" />
-    );
   };
 
   return (
-    <div className="rounded-lg border border-border overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-12">#</TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("country")}
-                className="hover:bg-transparent p-0 h-auto font-semibold"
-              >
-                Country
-                {getSortIcon("country")}
-              </Button>
-            </TableHead>
-            <TableHead className="text-right">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("cases")}
-                className="hover:bg-transparent p-0 h-auto font-semibold ml-auto flex"
-              >
-                Cases
-                {getSortIcon("cases")}
-              </Button>
-            </TableHead>
-            <TableHead className="text-right">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("deaths")}
-                className="hover:bg-transparent p-0 h-auto font-semibold ml-auto flex"
-              >
-                Deaths
-                {getSortIcon("deaths")}
-              </Button>
-            </TableHead>
-            <TableHead className="text-right">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("recovered")}
-                className="hover:bg-transparent p-0 h-auto font-semibold ml-auto flex"
-              >
-                Recovered
-                {getSortIcon("recovered")}
-              </Button>
-            </TableHead>
-            <TableHead className="text-right">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("active")}
-                className="hover:bg-transparent p-0 h-auto font-semibold ml-auto flex"
-              >
-                Active
-                {getSortIcon("active")}
-              </Button>
-            </TableHead>
-            <TableHead className="text-right">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("critical")}
-                className="hover:bg-transparent p-0 h-auto font-semibold ml-auto flex"
-              >
-                Critical
-                {getSortIcon("critical")}
-              </Button>
-            </TableHead>
-            <TableHead className="text-right">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("tests")}
-                className="hover:bg-transparent p-0 h-auto font-semibold ml-auto flex"
-              >
-                Tests
-                {getSortIcon("tests")}
-              </Button>
-            </TableHead>
-            <TableHead className="text-right">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("population")}
-                className="hover:bg-transparent p-0 h-auto font-semibold ml-auto flex"
-              >
-                Population
-                {getSortIcon("population")}
-              </Button>
-            </TableHead>
-            <TableHead>Continent</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginatedCountries.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={10}
-                className="text-center py-8 text-muted-foreground"
-              >
-                No countries found
-              </TableCell>
-            </TableRow>
-          ) : (
-            paginatedCountries.map((country, index) => (
-              <TableRow key={country.country}>
-                <TableCell className="font-medium">
-                  {(page - 1) * pageSize + index + 1}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={country.countryInfo.flag}
-                      alt={country.country}
-                      className="w-6 h-4 object-cover rounded"
-                    />
-                    <span className="font-medium">{country.country}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatNumber(country.cases)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatNumber(country.deaths)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatNumber(country.recovered)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatNumber(country.active)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatNumber(country.critical)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatNumber(country.tests)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatNumber(country.population)}
-                </TableCell>
-                <TableCell>{country.continent}</TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead className="bg-muted sticky top-0 z-10">
+          <tr>
+            <th className="px-4 py-3 text-left text-sm font-medium sticky left-0 bg-muted z-20">
+              Country
+            </th>
+            <th className="px-4 py-3 text-right text-sm font-medium">Cases</th>
+            <th className="px-4 py-3 text-right text-sm font-medium">Today</th>
+            <th className="px-4 py-3 text-right text-sm font-medium">Deaths</th>
+            <th className="px-4 py-3 text-right text-sm font-medium">Today</th>
+            <th className="px-4 py-3 text-right text-sm font-medium">
+              Recovered
+            </th>
+            <th className="px-4 py-3 text-right text-sm font-medium">Active</th>
+            <th className="px-4 py-3 text-right text-sm font-medium">
+              Critical
+            </th>
+            <th className="px-4 py-3 text-right text-sm font-medium">Tests</th>
+            <th className="px-4 py-3 text-center text-sm font-medium w-20">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y">
+          {paginatedCountries.map((country) => (
+            <tr
+              key={country.country}
+              className="hover:bg-muted/50 transition-colors group"
+            >
+              <td className="px-4 py-3 sticky left-0 bg-card group-hover:bg-muted/50 transition-colors z-10 shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
+                <div className="flex items-center gap-2">
+                  <img
+                    src={country.countryInfo.flag}
+                    alt={country.country}
+                    className="w-6 h-4 object-cover rounded"
+                  />
+                  <span className="font-medium whitespace-nowrap">
+                    {country.country}
+                  </span>
+                </div>
+              </td>
+              <td className="px-4 py-3 text-right font-mono text-blue-600 dark:text-blue-400">
+                {country.cases.toLocaleString()}
+              </td>
+              <td className="px-4 py-3 text-right font-mono text-xs text-blue-600 dark:text-blue-400">
+                +{country.todayCases.toLocaleString()}
+              </td>
+              <td className="px-4 py-3 text-right font-mono text-red-600 dark:text-red-400">
+                {country.deaths.toLocaleString()}
+              </td>
+              <td className="px-4 py-3 text-right font-mono text-xs text-red-600 dark:text-red-400">
+                +{country.todayDeaths.toLocaleString()}
+              </td>
+              <td className="px-4 py-3 text-right font-mono text-green-600 dark:text-green-400">
+                {country.recovered.toLocaleString()}
+              </td>
+              <td className="px-4 py-3 text-right font-mono text-orange-600 dark:text-orange-400">
+                {country.active.toLocaleString()}
+              </td>
+              <td className="px-4 py-3 text-right font-mono text-purple-600 dark:text-purple-400">
+                {country.critical.toLocaleString()}
+              </td>
+              <td className="px-4 py-3 text-right font-mono text-gray-600 dark:text-gray-400">
+                {country.tests.toLocaleString()}
+              </td>
+              <td className="px-4 py-3 text-center">
+                <button
+                  onClick={() => handleCopy(country)}
+                  className={cn(
+                    "p-2 rounded-md transition-colors hover:bg-accent",
+                    "opacity-0 md:group-hover:opacity-100 md:opacity-100"
+                  )}
+                  aria-label="Copy country data"
+                  title="Copy data to clipboard"
+                >
+                  {copiedId === country.country ? (
+                    <Check className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <Copy className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { axiosBaseQuery } from "@/lib/axiosBaseQuery";
 import {
   API_BASE_URL,
   API_ENDPOINTS,
@@ -7,28 +8,41 @@ import {
 import type { Country, GlobalStats } from "../types/country.types";
 
 /**
- * RTK Query API slice for COVID-19 data
- * Handles all API calls with automatic caching and refetching
+ * RTK Query API slice using Axios for HTTP requests
+ * Provides endpoints for fetching COVID-19 data from disease.sh API
  */
 export const countriesApi = createApi({
   reducerPath: "countriesApi",
-  baseQuery: fetchBaseQuery({ baseUrl: API_BASE_URL }),
-
-  // Cache data for 5 minutes by default
+  baseQuery: axiosBaseQuery({ baseUrl: API_BASE_URL }),
   keepUnusedDataFor: CACHE_TIME.MEDIUM,
 
   endpoints: (builder) => ({
-    // Fetch global COVID-19 statistics
+    /**
+     * Fetch global COVID-19 statistics
+     * @returns Global stats including total cases, deaths, recovered, etc.
+     */
     getGlobalStats: builder.query<GlobalStats, void>({
-      query: () => API_ENDPOINTS.GLOBAL,
+      query: () => ({
+        url: API_ENDPOINTS.GLOBAL,
+        method: "GET",
+      }),
     }),
 
-    // Fetch all countries data
+    /**
+     * Fetch COVID-19 data for all countries
+     * @returns Array of country data with cases, deaths, etc.
+     */
     getCountries: builder.query<Country[], void>({
-      query: () => API_ENDPOINTS.COUNTRIES,
+      query: () => ({
+        url: API_ENDPOINTS.COUNTRIES,
+        method: "GET",
+      }),
     }),
   }),
 });
 
-// Export hooks for usage in components
+/**
+ * Auto-generated hooks for each endpoint
+ * Use these hooks in components to fetch data
+ */
 export const { useGetGlobalStatsQuery, useGetCountriesQuery } = countriesApi;
