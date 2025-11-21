@@ -177,7 +177,6 @@ export function CountriesTable({
   const filters = useAppSelector(selectFilters);
   const { selectedCountriesForComparison } = filters;
 
-  // Calculate paginated data
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedCountries = countries.slice(startIndex, endIndex);

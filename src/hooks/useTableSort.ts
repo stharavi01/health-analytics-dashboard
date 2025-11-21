@@ -55,7 +55,6 @@ export function useTableSort<T extends Record<string, unknown>>(
         : bValue.localeCompare(aValue);
     }
 
-    // Numeric comparison
     const numA = Number(aValue) || 0;
     const numB = Number(bValue) || 0;
     return sortOrder === "asc" ? numA - numB : numB - numA;

@@ -1,15 +1,8 @@
-/**
- * Export data to CSV or JSON format
- */
-
 import type {
   Country,
   GlobalStats,
 } from "@/features/countries/types/country.types";
 
-/**
- * Convert data to CSV format
- */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function exportToCSV<T extends Record<string, any>>(
   data: T[],
@@ -21,19 +14,15 @@ export function exportToCSV<T extends Record<string, any>>(
     return;
   }
 
-  // Determine columns
   const cols =
     columns || Object.keys(data[0]).map((key) => ({ key, label: key }));
 
-  // Create CSV header
   const header = cols.map((col) => col.label).join(",");
 
-  // Create CSV rows
   const rows = data.map((row) =>
     cols
       .map((col) => {
         const value = row[col.key];
-        // Handle values that contain commas or quotes
         if (
           typeof value === "string" &&
           (value.includes(",") || value.includes('"'))
@@ -45,16 +34,11 @@ export function exportToCSV<T extends Record<string, any>>(
       .join(",")
   );
 
-  // Combine header and rows
   const csv = [header, ...rows].join("\n");
 
-  // Create and trigger download
   downloadFile(csv, `${filename}.csv`, "text/csv");
 }
 
-/**
- * Export data to JSON format
- */
 export function exportToJSON<T>(data: T, filename: string) {
   if (!data) {
     console.warn("No data to export");

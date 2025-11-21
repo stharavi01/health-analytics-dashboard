@@ -46,18 +46,15 @@ export function DashboardPage() {
     refetch: refetchHistorical,
   } = useGetGlobalHistoricalQuery(historicalDays);
 
-  // Filter countries based on active filters
   const filteredCountries = useMemo(() => {
     if (!countries) return [];
 
-    let filtered = [...countries];
+    let filtered = [...(countries || [])];
 
-    // Apply continent filter
     if (filters.continent !== "All") {
       filtered = filtered.filter((c) => c.continent === filters.continent);
     }
 
-    // Apply severity filter
     if (filters.severity !== "All") {
       const getSeverity = (cases: number): "Low" | "Medium" | "High" => {
         if (cases < 100000) return "Low";
@@ -69,25 +66,21 @@ export function DashboardPage() {
       );
     }
 
-    // Apply cases range filter
     filtered = filtered.filter(
       (c) =>
         c.cases >= filters.casesRange[0] && c.cases <= filters.casesRange[1]
     );
 
-    // Apply deaths range filter
     filtered = filtered.filter(
       (c) =>
         c.deaths >= filters.deathsRange[0] && c.deaths <= filters.deathsRange[1]
     );
 
-    // Apply active range filter
     filtered = filtered.filter(
       (c) =>
         c.active >= filters.activeRange[0] && c.active <= filters.activeRange[1]
     );
 
-    // Apply recovery rate filter
     filtered = filtered.filter((c) => {
       const recoveryRate = c.recovered > 0 ? (c.recovered / c.cases) * 100 : 0;
       return (
@@ -96,7 +89,6 @@ export function DashboardPage() {
       );
     });
 
-    // Apply fatality rate filter
     filtered = filtered.filter((c) => {
       const fatalityRate = c.deaths > 0 ? (c.deaths / c.cases) * 100 : 0;
       return (
@@ -108,7 +100,6 @@ export function DashboardPage() {
     return filtered;
   }, [countries, filters]);
 
-  // Calculate aggregated stats from filtered countries
   const filteredStats = useMemo(() => {
     if (!filteredCountries.length) {
       return {
@@ -144,7 +135,6 @@ export function DashboardPage() {
     );
   }, [filteredCountries]);
 
-  // Manual refetch all data
   const refetchAll = () => {
     refetchGlobal();
     refetchCountries();

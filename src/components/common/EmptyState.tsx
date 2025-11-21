@@ -9,9 +9,6 @@ export interface EmptyStateProps {
   className?: string;
 }
 
-/**
- * Reusable empty state component for consistent empty states
- */
 export function EmptyState({
   icon: Icon,
   title = "No data found",
@@ -19,7 +16,6 @@ export function EmptyState({
   action,
   className,
 }: EmptyStateProps) {
-  // Use default icon if none provided
   const DisplayIcon = Icon || FileQuestion;
 
   return (

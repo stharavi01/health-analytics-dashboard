@@ -50,9 +50,8 @@ export const KPICard = memo(function KPICard({
   const [displayValue, setDisplayValue] = useState(0);
   const [copied, setCopied] = useState(false);
 
-  // Animated counter effect
   useEffect(() => {
-    const duration = 1000; // 1 second
+    const duration = 1000;
     const steps = 60;
     const increment = value / steps;
     let current = 0;

@@ -33,12 +33,9 @@ export interface FiltersState {
   currentPage: number;
   itemsPerPage: number;
   autoRefresh: boolean;
-  refreshInterval: number; // in seconds
+  refreshInterval: number;
 }
 
-/**
- * Load initial state from localStorage if available
- */
 const loadFromLocalStorage = (): Partial<FiltersState> => {
   if (typeof window === "undefined") return {};
 
@@ -46,7 +43,6 @@ const loadFromLocalStorage = (): Partial<FiltersState> => {
     const saved = localStorage.getItem("filters-preferences");
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Only restore non-filter preferences (itemsPerPage, sortBy, sortOrder)
       return {
         itemsPerPage: parsed.itemsPerPage,
         sortBy: parsed.sortBy,
@@ -60,9 +56,6 @@ const loadFromLocalStorage = (): Partial<FiltersState> => {
   return {};
 };
 
-/**
- * Save preferences to localStorage
- */
 const saveToLocalStorage = (state: FiltersState) => {
   if (typeof window === "undefined") return;
 
@@ -78,9 +71,6 @@ const saveToLocalStorage = (state: FiltersState) => {
   }
 };
 
-/**
- * Initial state for filters
- */
 const initialState: FiltersState = {
   search: "",
   continent: "All",
@@ -98,23 +88,17 @@ const initialState: FiltersState = {
   currentPage: 1,
   itemsPerPage: 10,
   autoRefresh: false,
-  refreshInterval: 300, // 5 minutes
+  refreshInterval: 300,
   ...loadFromLocalStorage(),
 };
 
-/**
- * Filters slice for managing table filters and pagination
- */
 export const filtersSlice = createSlice({
   name: "filters",
   initialState,
   reducers: {
-    /**
-     * Set search query
-     */
     setSearch: (state, action: PayloadAction<string>) => {
       state.search = action.payload;
-      state.currentPage = 1; // Reset to first page on search
+      state.currentPage = 1;
     },
 
     /**
@@ -133,49 +117,31 @@ export const filtersSlice = createSlice({
       state.currentPage = 1;
     },
 
-    /**
-     * Set cases range filter
-     */
     setCasesRange: (state, action: PayloadAction<[number, number]>) => {
       state.casesRange = action.payload;
       state.currentPage = 1;
     },
 
-    /**
-     * Set deaths range filter
-     */
     setDeathsRange: (state, action: PayloadAction<[number, number]>) => {
       state.deathsRange = action.payload;
       state.currentPage = 1;
     },
 
-    /**
-     * Set active range filter
-     */
     setActiveRange: (state, action: PayloadAction<[number, number]>) => {
       state.activeRange = action.payload;
       state.currentPage = 1;
     },
 
-    /**
-     * Set recovery rate range filter
-     */
     setRecoveryRateRange: (state, action: PayloadAction<[number, number]>) => {
       state.recoveryRateRange = action.payload;
       state.currentPage = 1;
     },
 
-    /**
-     * Set fatality rate range filter
-     */
     setFatalityRateRange: (state, action: PayloadAction<[number, number]>) => {
       state.fatalityRateRange = action.payload;
       state.currentPage = 1;
     },
 
-    /**
-     * Set date range preset
-     */
     setDateRangePreset: (
       state,
       action: PayloadAction<DateRangePreset | "custom">
@@ -186,9 +152,6 @@ export const filtersSlice = createSlice({
       }
     },
 
-    /**
-     * Set custom date range
-     */
     setCustomDateRange: (
       state,
       action: PayloadAction<{ start: Date | null; end: Date | null }>
@@ -197,18 +160,12 @@ export const filtersSlice = createSlice({
       state.dateRangePreset = "custom";
     },
 
-    /**
-     * Add country to comparison
-     */
     addCountryToComparison: (state, action: PayloadAction<string>) => {
       if (!state.selectedCountriesForComparison.includes(action.payload)) {
         state.selectedCountriesForComparison.push(action.payload);
       }
     },
 
-    /**
-     * Remove country from comparison
-     */
     removeCountryFromComparison: (state, action: PayloadAction<string>) => {
       state.selectedCountriesForComparison =
         state.selectedCountriesForComparison.filter(
@@ -216,30 +173,18 @@ export const filtersSlice = createSlice({
         );
     },
 
-    /**
-     * Clear comparison countries
-     */
     clearComparison: (state) => {
       state.selectedCountriesForComparison = [];
     },
 
-    /**
-     * Toggle auto refresh
-     */
     toggleAutoRefresh: (state) => {
       state.autoRefresh = !state.autoRefresh;
     },
 
-    /**
-     * Set refresh interval
-     */
     setRefreshInterval: (state, action: PayloadAction<number>) => {
       state.refreshInterval = action.payload;
     },
 
-    /**
-     * Set sort column and order
-     */
     setSort: (
       state,
       action: PayloadAction<{
@@ -252,34 +197,22 @@ export const filtersSlice = createSlice({
       saveToLocalStorage(state);
     },
 
-    /**
-     * Set current page
-     */
     setCurrentPage: (state, action: PayloadAction<number>) => {
       state.currentPage = action.payload;
     },
 
-    /**
-     * Set items per page
-     */
     setItemsPerPage: (state, action: PayloadAction<number>) => {
       state.itemsPerPage = action.payload;
-      state.currentPage = 1; // Reset to first page on items per page change
+      state.currentPage = 1;
       saveToLocalStorage(state);
     },
 
-    /**
-     * Reset all filters to initial state
-     */
     resetFilters: (state) => {
       Object.assign(state, initialState);
     },
   },
 });
 
-/**
- * Action creators
- */
 export const {
   setSearch,
   setContinent,

@@ -18,7 +18,6 @@ export const toast = {
 };
 
 function showToast(message: string, type: ToastType) {
-  // Create toast element
   const toastEl = document.createElement("div");
   toastEl.className = `fixed top-4 right-4 z-[100] px-4 py-3 rounded-lg shadow-lg border transition-all duration-300 transform translate-x-0 max-w-sm ${
     type === "success"
@@ -32,12 +31,10 @@ function showToast(message: string, type: ToastType) {
 
   document.body.appendChild(toastEl);
 
-  // Animate in
   requestAnimationFrame(() => {
     toastEl.style.transform = "translateX(0)";
   });
 
-  // Remove after 3 seconds
   setTimeout(() => {
     toastEl.style.opacity = "0";
     toastEl.style.transform = "translateX(100%)";

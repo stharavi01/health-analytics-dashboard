@@ -122,8 +122,7 @@ function TableCell({ children, className, align = "left" }: TableCellProps) {
   );
 }
 
-// Compound component export
-export const Table = Object.assign(TableRoot, {
+export const Table = Object.assign(Root, {
   Header: TableHeader,
   Body: TableBody,
   Row: TableRow,
