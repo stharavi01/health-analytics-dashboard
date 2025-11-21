@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Search, Download, Filter } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { CONTINENTS } from "@/constants/api.constants";
 import { CountriesTable } from "./components/CountriesTable";
 import { TablePagination } from "./components/TablePagination";
@@ -53,9 +53,17 @@ export function CountriesPage() {
   const dispatch = useAppDispatch();
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [rangeFiltersOpen, setRangeFiltersOpen] = useState(false);
+  const tableScrollRef = useRef<HTMLDivElement>(null);
 
   // Debounce search input
   const debouncedSearch = useDebounce(filters.search, 300);
+
+  // Scroll to top when page changes
+  useEffect(() => {
+    if (tableScrollRef.current) {
+      tableScrollRef.current.scrollTop = 0;
+    }
+  }, [filters.currentPage]);
 
   // Calculate min/max values for range filters
   const rangeStats = useMemo(() => {
@@ -416,7 +424,7 @@ export function CountriesPage() {
 
       {/* Table with sticky pagination */}
       <Card className="overflow-hidden flex flex-col h-[calc(100vh-20rem)]">
-        <div className="overflow-auto flex-1">
+        <div ref={tableScrollRef} className="overflow-auto flex-1">
           <CountriesTable
             countries={filteredCountries}
             currentPage={filters.currentPage}
