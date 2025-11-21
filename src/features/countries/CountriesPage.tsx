@@ -22,17 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Search, Download, Filter } from "lucide-react";
+import { Search, Download, Filter } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CONTINENTS } from "@/constants/api.constants";
 import { CountriesTable } from "./components/CountriesTable";
@@ -43,6 +34,7 @@ import { CountryDetailsDrawer } from "./components/CountryDetailsDrawer";
 import type { Country } from "./types/country.types";
 import { exportToCSV } from "@/lib/export-csv";
 import { toast } from "@/lib/toast";
+import { LoadingState, ErrorState } from "@/components/common";
 
 /**
  * Countries Page - Displays COVID-19 data for all countries with filters
@@ -220,13 +212,10 @@ export function CountriesPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="space-y-6">
         <h1 className="text-3xl font-bold">Countries Data</h1>
         <Card className="p-6">
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-64 w-full" />
-          </div>
+          <LoadingState type="table" rows={10} columns={8} />
         </Card>
       </div>
     );
@@ -238,21 +227,13 @@ export function CountriesPage() {
       "Failed to load countries";
 
     return (
-      <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">Countries Data</h1>
-        <div className="rounded-lg border border-destructive bg-destructive/10 p-6">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-destructive mt-0.5" />
-            <div>
-              <p className="text-destructive font-semibold mb-2">
-                {errorMessage}
-              </p>
-              <Button onClick={() => refetch()} variant="outline" size="sm">
-                Retry
-              </Button>
-            </div>
-          </div>
-        </div>
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">Countries Data</h1>
+        <ErrorState
+          title="Failed to load countries data"
+          message={errorMessage}
+          onRetry={() => refetch()}
+        />
       </div>
     );
   }
@@ -319,57 +300,19 @@ export function CountriesPage() {
                 <SelectItem value="High">High (&gt; 1M)</SelectItem>
               </SelectContent>
             </Select>
-            <Sheet
-              open={showAdvancedFilters}
-              onOpenChange={setShowAdvancedFilters}
+            <Button
+              variant={showAdvancedFilters ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
             >
-              <SheetTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Advanced Filters
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>Advanced Filters</SheetTitle>
-                  <SheetDescription>
-                    Fine-tune your data with range filters
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="mt-6 space-y-6">
-                  <RangeFilter
-                    label="Cases Range"
-                    min={0}
-                    max={rangeStats.maxCases}
-                    value={filters.casesRange}
-                    onChange={(value) => dispatch(setCasesRange(value))}
-                  />
-                  <RangeFilter
-                    label="Deaths Range"
-                    min={0}
-                    max={rangeStats.maxDeaths}
-                    value={filters.deathsRange}
-                    onChange={(value) => dispatch(setDeathsRange(value))}
-                  />
-                  <RangeFilter
-                    label="Active Cases Range"
-                    min={0}
-                    max={rangeStats.maxActive}
-                    value={filters.activeRange}
-                    onChange={(value) => dispatch(setActiveRange(value))}
-                  />
-                  <div className="pt-4 border-t">
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={handleClearAllFilters}
-                    >
-                      Reset All Filters
-                    </Button>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
+              <Filter className="h-4 w-4 mr-2" />
+              Ranges
+              {activeFilterChips.length > 0 && (
+                <span className="ml-2 px-1.5 py-0.5 text-xs bg-primary-foreground text-primary rounded-full">
+                  {activeFilterChips.length}
+                </span>
+              )}
+            </Button>
           </div>
 
           {/* Filter Chips */}
@@ -384,29 +327,80 @@ export function CountriesPage() {
         </div>
       </Card>
 
-      {/* Table with sticky pagination */}
-      <Card className="overflow-hidden flex flex-col max-h-[calc(100vh-20rem)]">
-        <div className="overflow-auto flex-1">
-          <CountriesTable
-            countries={filteredCountries}
-            currentPage={filters.currentPage}
-            itemsPerPage={filters.itemsPerPage}
-            onRowClick={(country) => setSelectedCountry(country)}
-          />
-        </div>
-        <div className="sticky bottom-0 bg-card border-t">
-          <TablePagination
-            currentPage={filters.currentPage}
-            totalPages={Math.ceil(
-              filteredCountries.length / filters.itemsPerPage
-            )}
-            itemsPerPage={filters.itemsPerPage}
-            totalItems={filteredCountries.length}
-            onPageChange={(page) => dispatch(setCurrentPage(page))}
-            onItemsPerPageChange={(items) => dispatch(setItemsPerPage(items))}
-          />
-        </div>
-      </Card>
+      {/* Main Content Area with Side-by-Side Layout */}
+      <div className="flex gap-4 items-start">
+        {/* Advanced Filters Panel - Collapsible Side Panel */}
+        {showAdvancedFilters && (
+          <Card className="w-80 shrink-0 p-4 space-y-4 sticky top-4 self-start">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm">Range Filters</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAdvancedFilters(false)}
+                className="h-8 w-8 p-0"
+              >
+                <Filter className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="space-y-6">
+              <RangeFilter
+                label="Cases Range"
+                min={0}
+                max={rangeStats.maxCases}
+                value={filters.casesRange}
+                onChange={(value) => dispatch(setCasesRange(value))}
+              />
+              <RangeFilter
+                label="Deaths Range"
+                min={0}
+                max={rangeStats.maxDeaths}
+                value={filters.deathsRange}
+                onChange={(value) => dispatch(setDeathsRange(value))}
+              />
+              <RangeFilter
+                label="Active Cases Range"
+                min={0}
+                max={rangeStats.maxActive}
+                value={filters.activeRange}
+                onChange={(value) => dispatch(setActiveRange(value))}
+              />
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleClearAllFilters}
+                size="sm"
+              >
+                Reset All
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        {/* Table with sticky pagination - Fixed height with visible pagination */}
+        <Card className="overflow-hidden flex flex-col flex-1 h-[calc(100vh-20rem)]">
+          <div className="overflow-auto flex-1">
+            <CountriesTable
+              countries={filteredCountries}
+              currentPage={filters.currentPage}
+              itemsPerPage={filters.itemsPerPage}
+              onRowClick={(country) => setSelectedCountry(country)}
+            />
+          </div>
+          <div className="border-t bg-card">
+            <TablePagination
+              currentPage={filters.currentPage}
+              totalPages={Math.ceil(
+                filteredCountries.length / filters.itemsPerPage
+              )}
+              itemsPerPage={filters.itemsPerPage}
+              totalItems={filteredCountries.length}
+              onPageChange={(page) => dispatch(setCurrentPage(page))}
+              onItemsPerPageChange={(items) => dispatch(setItemsPerPage(items))}
+            />
+          </div>
+        </Card>
+      </div>
 
       {/* Country Details Drawer */}
       <CountryDetailsDrawer

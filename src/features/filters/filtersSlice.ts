@@ -30,6 +30,48 @@ export interface FiltersState {
 }
 
 /**
+ * Load initial state from localStorage if available
+ */
+const loadFromLocalStorage = (): Partial<FiltersState> => {
+  if (typeof window === "undefined") return {};
+
+  try {
+    const saved = localStorage.getItem("filters-preferences");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Only restore non-filter preferences (itemsPerPage, sortBy, sortOrder)
+      return {
+        itemsPerPage: parsed.itemsPerPage,
+        sortBy: parsed.sortBy,
+        sortOrder: parsed.sortOrder,
+      };
+    }
+  } catch (error) {
+    console.error("Failed to load filters from localStorage:", error);
+  }
+
+  return {};
+};
+
+/**
+ * Save preferences to localStorage
+ */
+const saveToLocalStorage = (state: FiltersState) => {
+  if (typeof window === "undefined") return;
+
+  try {
+    const preferences = {
+      itemsPerPage: state.itemsPerPage,
+      sortBy: state.sortBy,
+      sortOrder: state.sortOrder,
+    };
+    localStorage.setItem("filters-preferences", JSON.stringify(preferences));
+  } catch (error) {
+    console.error("Failed to save filters to localStorage:", error);
+  }
+};
+
+/**
  * Initial state for filters
  */
 const initialState: FiltersState = {
@@ -43,6 +85,7 @@ const initialState: FiltersState = {
   sortOrder: "desc",
   currentPage: 1,
   itemsPerPage: 10,
+  ...loadFromLocalStorage(),
 };
 
 /**
@@ -112,6 +155,7 @@ export const filtersSlice = createSlice({
     ) => {
       state.sortBy = action.payload.sortBy;
       state.sortOrder = action.payload.sortOrder;
+      saveToLocalStorage(state);
     },
 
     /**
@@ -127,6 +171,7 @@ export const filtersSlice = createSlice({
     setItemsPerPage: (state, action: PayloadAction<number>) => {
       state.itemsPerPage = action.payload;
       state.currentPage = 1; // Reset to first page on items per page change
+      saveToLocalStorage(state);
     },
 
     /**

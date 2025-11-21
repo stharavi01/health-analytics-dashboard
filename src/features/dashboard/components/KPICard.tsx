@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Card } from "@/components/ui/card";
 import {
   LucideIcon,
@@ -36,8 +36,9 @@ const iconBgClasses = {
 
 /**
  * Enhanced KPI Card with animations, copy-to-clipboard, and trend indicators
+ * Memoized for performance optimization
  */
-export function KPICard({
+export const KPICard = memo(function KPICard({
   label,
   value,
   change,
@@ -80,10 +81,21 @@ export function KPICard({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleCopy();
+    }
+  };
+
   return (
     <Card
       className="p-6 relative overflow-hidden group hover:shadow-lg transition-all duration-200 cursor-pointer hover:scale-[1.02]"
       onClick={handleCopy}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={`${label}: ${value.toLocaleString()}. Press Enter to copy value`}
     >
       {/* Background icon decoration */}
       <div
@@ -91,6 +103,7 @@ export function KPICard({
           "absolute -right-4 -top-4 opacity-5",
           iconBgClasses[color]
         )}
+        aria-hidden="true"
       >
         <Icon className="h-32 w-32" />
       </div>
@@ -99,7 +112,10 @@ export function KPICard({
       <div className="relative space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
-          <div className={cn("p-2 rounded-lg", iconBgClasses[color])}>
+          <div
+            className={cn("p-2 rounded-lg", iconBgClasses[color])}
+            aria-hidden="true"
+          >
             <Icon className={cn("h-5 w-5", colorClasses[color])} />
           </div>
         </div>
@@ -110,17 +126,28 @@ export function KPICard({
               "text-3xl font-bold tabular-nums",
               colorClasses[color]
             )}
+            aria-live="polite"
           >
             {displayValue.toLocaleString()}
           </p>
 
           {change !== undefined && (
-            <div className="flex items-center gap-1">
+            <div
+              className="flex items-center gap-1"
+              role="status"
+              aria-live="polite"
+            >
               {trend === "up" && (
-                <TrendingUp className="h-4 w-4 text-green-600" />
+                <TrendingUp
+                  className="h-4 w-4 text-green-600"
+                  aria-label="Trending up"
+                />
               )}
               {trend === "down" && (
-                <TrendingDown className="h-4 w-4 text-red-600" />
+                <TrendingDown
+                  className="h-4 w-4 text-red-600"
+                  aria-label="Trending down"
+                />
               )}
               <span className="text-xs text-muted-foreground">
                 {change > 0 && "+"}
@@ -131,7 +158,10 @@ export function KPICard({
         </div>
 
         {/* Copy indicator */}
-        <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div
+          className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+          aria-hidden="true"
+        >
           {copied ? (
             <Check className="h-4 w-4 text-green-600" />
           ) : (
@@ -141,4 +171,4 @@ export function KPICard({
       </div>
     </Card>
   );
-}
+});

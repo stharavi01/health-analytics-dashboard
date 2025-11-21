@@ -3,11 +3,11 @@ import {
   useGetCountriesQuery,
 } from "../countries/api/countriesApi";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, Activity, Skull, HeartPulse, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { KPICard } from "./components/KPICard";
 import { TopCountriesChart } from "./components/TopCountriesChart";
+import { LoadingState, ErrorState } from "@/components/common";
 
 /**
  * Dashboard Page - Displays global COVID-19 statistics
@@ -18,16 +18,12 @@ export function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-6">
-        <h1 className="text-3xl font-bold">COVID-19 Global Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="p-6">
-              <Skeleton className="h-4 w-24 mb-2" />
-              <Skeleton className="h-8 w-32" />
-            </Card>
-          ))}
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">COVID-19 Global Dashboard</h1>
+          <p className="text-muted-foreground mt-2">Loading statistics...</p>
         </div>
+        <LoadingState type="stats" />
       </div>
     );
   }
@@ -37,21 +33,13 @@ export function DashboardPage() {
       (error as { userMessage?: string }).userMessage || "Failed to load data";
 
     return (
-      <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">COVID-19 Global Dashboard</h1>
-        <div className="rounded-lg border border-destructive bg-destructive/10 p-6">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-destructive mt-0.5" />
-            <div>
-              <p className="text-destructive font-semibold mb-2">
-                {errorMessage}
-              </p>
-              <Button onClick={() => refetch()} variant="outline" size="sm">
-                Retry
-              </Button>
-            </div>
-          </div>
-        </div>
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">COVID-19 Global Dashboard</h1>
+        <ErrorState
+          title="Failed to load dashboard data"
+          message={errorMessage}
+          onRetry={() => refetch()}
+        />
       </div>
     );
   }
