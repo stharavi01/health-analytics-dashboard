@@ -47,12 +47,12 @@ export function ExportButton({ data }: ExportButtonProps) {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 flex-1">
       <Select
         value={format}
         onValueChange={(v) => setFormat(v as "csv" | "json")}
       >
-        <SelectTrigger className="w-[100px]">
+        <SelectTrigger className="h-8 flex-1 text-xs sm:text-sm">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -60,9 +60,13 @@ export function ExportButton({ data }: ExportButtonProps) {
           <SelectItem value="json">JSON</SelectItem>
         </SelectContent>
       </Select>
-      <Button onClick={handleExport} size="sm" className="gap-2">
-        <Download className="h-4 w-4" />
-        Export
+      <Button
+        onClick={handleExport}
+        size="sm"
+        className="gap-1.5 h-8 flex-1 text-xs sm:text-sm"
+      >
+        <Download className="h-3.5 w-3.5" />
+        <span>Export</span>
       </Button>
     </div>
   );
